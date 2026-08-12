@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="NEDOCS ไทย">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>NEDOCS ไทย</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Emergency Department</div>
+        <h1>NEDOCS ไทย</h1>
+        <p>ประเมินความแออัดห้องฉุกเฉิน</p>
+      </div>
+      <button id="settingsBtn" class="icon-btn" aria-label="ตั้งค่า">⚙️</button>
+    </header>
+
+    <section id="statusCard" class="status-card neutral">
+      <div class="status-label">ผลการประเมิน</div>
+      <div id="score" class="score">—</div>
+      <div id="level" class="level">กรอกข้อมูลแล้วกดคำนวณ</div>
+      <div id="scoreHint" class="score-hint">NEDOCS 0–200</div>
+    </section>
+
+    <form id="nedocsForm" autocomplete="off">
+      <section class="card">
+        <div class="section-title">ข้อมูล ณ เวลาประเมิน</div>
+
+        <label>
+          <span>ผู้ป่วยทั้งหมดใน ER</span>
+          <input id="totalpat" type="number" min="0" step="1" inputmode="numeric" placeholder="เช่น 35" required>
+          <small>รวมผู้ป่วยในห้องตรวจ ห้องรอ และผู้ป่วย Admit ที่ยังอยู่ ER</small>
+        </label>
+
+        <label>
+          <span>จำนวนเตียง ER ที่เปิดใช้งาน</span>
+          <input id="edbeds" type="number" min="1" step="1" inputmode="numeric" placeholder="เช่น 20" required>
+          <small>รวมเตียง/เก้าอี้/พื้นที่ที่เปิดใช้งานจริง</small>
+        </label>
+
+        <label>
+          <span>จำนวนเตียงผู้ป่วยในที่เปิดใช้งาน</span>
+          <input id="ipbeds" type="number" min="1" step="1" inputmode="numeric" placeholder="เช่น 100" required>
+          <small>เตียงผู้ป่วยในที่มีการจัด staffing จริง</small>
+        </label>
+
+        <label>
+          <span>ผู้ป่วย Admit รอเตียงใน ER</span>
+          <input id="totaladmits" type="number" min="0" step="1" inputmode="numeric" placeholder="เช่น 8" required>
+        </label>
+
+        <label>
+          <span>ผู้ป่วยที่ต้องดูแล 1:1 / Ventilator</span>
+          <input id="ventilators" type="number" min="0" step="1" inputmode="numeric" placeholder="เช่น 2" required>
+          <small>ใช้ตามนิยาม/แนวทางที่หน่วยงานของคุณกำหนด</small>
+        </label>
+      </section>
+
+      <section class="card">
+        <div class="section-title">เวลารอ</div>
+
+        <label>
+          <span>Admit ที่รอเตียงนานที่สุด</span>
+          <div class="time-row">
+            <input id="longestHours" type="number" min="0" step="1" inputmode="numeric" placeholder="ชม.">
+            <span>ชม.</span>
+            <input id="longestMinutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="นาที">
+            <span>นาที</span>
+          </div>
+          <small>เริ่มนับจากเวลาที่มีคำสั่ง/ตัดสินใจ Admit</small>
+        </label>
+
+        <label>
+          <span>Door-to-bed ของผู้ป่วยล่าสุดที่ได้เตียง</span>
+          <div class="time-row">
+            <input id="lastBedHours" type="number" min="0" step="1" inputmode="numeric" placeholder="ชม.">
+            <span>ชม.</span>
+            <input id="lastBedMinutes" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="นาที">
+            <span>นาที</span>
+          </div>
+          <small>ใช้ Door-to-bed ของผู้ป่วยรายล่าสุดที่ได้รับเตียง</small>
+        </label>
+      </section>
+
+      <section class="card">
+        <div class="section-title">หมายเหตุ / เหตุการณ์สำคัญ</div>
+        <textarea id="note" rows="4" maxlength="1000" placeholder="เช่น รอ ICU 2 ราย, มีผู้ป่วย trauma เข้ามาหลายราย, เตียง Ward เต็ม..."></textarea>
+      </section>
+
+      <div class="sticky-actions">
+        <button type="button" id="calculateBtn" class="primary">คำนวณ NEDOCS</button>
+        <button type="button" id="saveBtn" class="secondary" disabled>บันทึกลง Google Sheets</button>
+        <button type="button" id="clearBtn" class="ghost">ล้างข้อมูล</button>
+      </div>
+    </form>
+
+    <section class="card history-card">
+      <div class="section-title-row">
+        <div class="section-title">ประวัติในเครื่อง</div>
+        <button id="clearHistoryBtn" class="text-btn">ล้างประวัติ</button>
+      </div>
+      <div id="history"></div>
+    </section>
+
+    <footer>
+      <p>NEDOCS ไทย • เครื่องมือสนับสนุนการประเมินความแออัด ไม่ใช่คำสั่งทางคลินิก</p>
+      <p>สูตรอ้างอิง NEDOCS 7 ตัวแปร</p>
+    </footer>
+  </main>
+
+  <dialog id="settingsDialog">
+    <div class="dialog-inner">
+      <h2>ตั้งค่าการเชื่อมต่อ</h2>
+      <p>ใส่ URL ของ Google Apps Script Web App ที่ได้จากขั้นตอนติดตั้ง</p>
+      <label>
+        <span>Google Apps Script URL</span>
+        <input id="apiUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec">
+      </label>
+      <div class="dialog-actions">
+        <button id="closeSettings" class="ghost" type="button">ยกเลิก</button>
+        <button id="saveSettings" class="primary" type="button">บันทึก</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

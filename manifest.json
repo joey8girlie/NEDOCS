@@ -1,0 +1,13 @@
+{
+  "name": "NEDOCS ไทย",
+  "short_name": "NEDOCS ไทย",
+  "description": "เครื่องมือประเมินความแออัดห้องฉุกเฉินด้วย NEDOCS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f7",
+  "theme_color": "#0f766e",
+  "lang": "th",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
